@@ -177,7 +177,7 @@ void MeshGeneration::refined_triangulation(bool DEBUG) {
   /* Refine the triangulation according to the attached */ 
   /* triangle area constraints.                         */
 
-  triangulate("przBPQ", &mid, &out, nullptr);  /* Remove -a switch if you are not considering trianglearealist---przBPQ */
+  triangulate("pqrzBPQ", &mid, &out, nullptr);  /* Remove -a switch if you are not considering trianglearealist---przBPQ */
 
   if (DEBUG) {
     std::cout << "Refined triangulation: " << '\n';
