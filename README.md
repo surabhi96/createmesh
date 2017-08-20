@@ -6,4 +6,5 @@ Steps to perform after cloning the repository
 3) Run $cmake ..
 4) Run $make
 5) The python script: use_calltri.py can be used to obtain the triangulation instance with all output triangulation parameters. Just run $ python use_calltri.py
+6) You can also run the jupyter notebook output_mesh_notebook.ipynb
 
