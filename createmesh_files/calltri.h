@@ -1,3 +1,7 @@
+/* Author: Surabhi Verma                */
+/* Last Edited: 20.08.2017              */
+                                        
+
 #ifndef CALLTRI_H 
 #define CALLTRI_H
 
@@ -30,7 +34,7 @@ class MeshGeneration {
   MeshGeneration();
 
   void input_polygon_vertices( std::vector< std::vector<REAL> >);
-  void input_holes(std::vector< std::vector< std::vector<REAL> > >, std::vector<REAL> );
+  void input_holes( std::vector< std::vector< std::vector<REAL> > >, std::vector<REAL> );
   void input_pointattributelist( int, std::vector<REAL> );
   void input_pointmarkerlist( std::vector<int> );
   //void input_segmentmarkerlist( std::vector<REAL> );

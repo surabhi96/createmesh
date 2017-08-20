@@ -1,3 +1,6 @@
+/* Author: Surabhi Verma                */
+/* Last Edited: 20.08.2017              */
+
 #include "calltri.h"
 
 MeshGeneration::MeshGeneration() {
@@ -43,52 +46,74 @@ MeshGeneration::MeshGeneration() {
 void MeshGeneration::input_polygon_vertices( std::vector< std::vector<REAL> > PolygonVertices ) {
 
   std::vector<REAL> PointList;
-  for (int i = 0; i < PolygonVertices.size(); i++) {
-    for (int j = 0; j < 2; j++)
-      PointList.push_back(PolygonVertices[i][j]);
-  }
-
-  in.numberofpoints = PointList.size()/2;
-  in.pointlist = new REAL[in.numberofpoints * 2];
-  assign(PointList, in.pointlist);
-}
-
-void MeshGeneration::input_holes(std::vector< std::vector< std::vector<REAL> > > InputHoles,  
-                                 std::vector<REAL> HoleList) { 
-
-  size_t prev_size = in.numberofpoints * 2;
-  in.numberofholes = InputHoles.size();
-  std::vector<REAL> HoleVertices;
   std::vector<int> SegmentList;
-  for (int i = 0; i < InputHoles.size(); i++) {
-    for (int j = 0; j < InputHoles[0].size(); j++) {
-      SegmentList.push_back(in.numberofpoints + j);
-      if (j < InputHoles[0].size() - 1) 
-        SegmentList.push_back(in.numberofpoints + j + 1);
-      else
-        SegmentList.push_back(in.numberofpoints);
-      for (int k = 0; k < 2; k++) 
-        HoleVertices.push_back(InputHoles[i][j][k]);
+  int i;
+  for (i = 0; i < PolygonVertices.size(); i++) {
+    for (int j = 0; j < 2; j++) {
+      PointList.push_back(PolygonVertices[i][j]);
+      if (i < PolygonVertices.size() - 1) 
+        SegmentList.push_back(i+j); 
     }
   }
-  
-  REAL * temp = new REAL[prev_size + HoleVertices.size()];
-  for (size_t s = 0; s < prev_size; s++)
-    *(temp+s) = *(in.pointlist+s);
-  for (size_t s = 0; s < HoleVertices.size(); s++)
-    *(temp+s+prev_size) = HoleVertices[s];
-  delete [] in.pointlist;
-  in.pointlist = temp;
-  temp = nullptr;
-  in.numberofpoints += HoleVertices.size()/2;
-  
-  in.holelist = new REAL[in.numberofholes * 2];
-  assign(HoleList, in.holelist);
+  SegmentList.push_back(i-1);
+  SegmentList.push_back(0);   
+
+  in.numberofpoints = PolygonVertices.size();
+  in.pointlist = new REAL[in.numberofpoints * 2];
+  assign(PointList, in.pointlist);
 
   in.numberofsegments = SegmentList.size()/2;
   in.segmentlist = new int[in.numberofsegments * 2];
   assign(SegmentList, in.segmentlist);
+
 }
+
+void MeshGeneration::input_holes( std::vector< std::vector< std::vector<REAL> > > InputHoles, std::vector<REAL> HoleList) { 
+
+  size_t prev_pointlist_size = in.numberofpoints * 2;
+  size_t prev_segmentlist_size = in.numberofsegments * 2;
+  in.numberofholes = InputHoles.size();
+  std::vector<REAL> HoleVertices;
+  std::vector<int> HoleSegmentList;
+
+  for (int i = 0; i < InputHoles.size(); i++) {
+    for (int j = 0; j < InputHoles[0].size(); j++) {
+      HoleSegmentList.push_back(in.numberofpoints + j);
+      if (j < InputHoles[0].size() - 1) 
+        HoleSegmentList.push_back(in.numberofpoints + j + 1);
+      else
+        HoleSegmentList.push_back(in.numberofpoints);
+      for (int k = 0; k < 2; k++) 
+        HoleVertices.push_back(InputHoles[i][j][k]);
+    }
+  }
+
+  REAL * temp = new REAL[prev_pointlist_size + HoleVertices.size()];
+  int * temp1 = new int[prev_segmentlist_size + HoleSegmentList.size()];
+  for (size_t s = 0; s < prev_pointlist_size; s++)
+    *(temp + s) = *(in.pointlist + s);
+  for (size_t s = 0; s < HoleVertices.size(); s++)
+    *(temp + s + prev_pointlist_size) = HoleVertices[s];
+  for (size_t s = 0; s < prev_segmentlist_size; s++)
+    *(temp1 + s) = *(in.segmentlist + s);
+  for (size_t s = 0; s < HoleVertices.size(); s++)
+    *(temp1 + s + prev_segmentlist_size) = HoleSegmentList[s];
+
+  delete [] in.pointlist;
+  delete [] in.segmentlist;
+  in.pointlist = temp;
+  in.segmentlist = temp1;
+  temp = nullptr;
+  temp1 = nullptr;
+  in.numberofpoints += HoleVertices.size() / 2;
+  in.numberofsegments += HoleSegmentList.size() / 2;
+  for (int k=0;k<in.numberofsegments*2;k++)
+    std::cout<<*(in.segmentlist+k)<<std::endl;
+  
+  in.holelist = new REAL[in.numberofholes * 2];
+  assign(HoleList, in.holelist);
+}
+
 
 void MeshGeneration::input_pointattributelist( int NumberofPointAttributes, std::vector<REAL> PointAttributeList ) {
 
@@ -152,7 +177,7 @@ void MeshGeneration::refined_triangulation(bool DEBUG) {
   /* Refine the triangulation according to the attached */ 
   /* triangle area constraints.                         */
 
-  triangulate("pqrzBPQ", &mid, &out, nullptr);  /* Remove -a switch if you are not considering trianglearealist---przBPQ */
+  triangulate("przBPQ", &mid, &out, nullptr);  /* Remove -a switch if you are not considering trianglearealist---przBPQ */
 
   if (DEBUG) {
     std::cout << "Refined triangulation: " << '\n';
