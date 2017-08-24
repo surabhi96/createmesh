@@ -68,8 +68,13 @@ void MeshGeneration::input_polygon_vertices( std::vector< std::vector<REAL> > Po
 
 }
 
-void MeshGeneration::input_holes( std::vector< std::vector< std::vector<REAL> > > InputHoles, std::vector<REAL> HoleList) { 
+void MeshGeneration::input_holes( std::vector< std::vector< std::vector<REAL> > > InputHoles, std::vector< std::vector<REAL> > InternalHolePoint) { 
 
+  std::vector<REAL> HoleList;
+  for (int i = 0; i < InternalHolePoint.size(); i++) {
+    for (int j = 0; j < 2; j++) 
+      HoleList.push_back(InternalHolePoint[i][j]);
+  }
   size_t prev_pointlist_size = in.numberofpoints * 2;
   size_t prev_segmentlist_size = in.numberofsegments * 2;
   in.numberofholes = InputHoles.size();
